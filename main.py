@@ -4,6 +4,8 @@
 
 import pandas as pd
 
+pd.set_option('display.max_columns', None)
+
 
 def scrape_years(years):
     """
@@ -29,13 +31,28 @@ def scrape_years(years):
         url = URL.format(year)
 
         # read in data
-        df_p100 = pd.read_html(url, header=0, match='Per 100 Poss Stats')
-        df_adv = pd.read_html(url, header=1, match='Advanced Stats')
-        df_shoot = pd.read_html(url, header=1, match='Shooting Stats')
+        df_p100 = pd.read_html(url, header=0, match='Per 100 Poss Stats')[0]
+        df_adv = pd.read_html(url, header=1, match='Advanced Stats')[0]
+        df_shoot = pd.read_html(url, header=1, match='Shooting Stats')[0]
 
-        print(df_p100[0])
-        print(df_adv[0])
-        print(df_shoot[0])
+        # clean per 100 data
+        df_p100.drop(['Rk', 'G', 'FG', 'FGA', 'FG%', '3P', '3PA', '3P%', '2P', '2PA', '2P%'],
+                     inplace=True,
+                     axis=1)
+
+        # clean advanced data
+        df_adv.drop(['Rk', 'L', 'Arena', 'Attend.'], inplace=True, axis=1)
+        """ Change W to W/L% """
+        #df_adv['W'] = df_adv['W'].apply(lambda x: round(x / 82, 2))
+        df_adv.dropna(axis=1, inplace=True)
+
+        # clean shooting data
+        df_shoot.drop(['Rk', 'G', 'MP'], inplace=True, axis=1)
+        df_shoot.dropna(axis=1, inplace=True)
+
+        print(df_p100)
+        print(df_adv)
+        print(df_shoot)
 
     return years_dict
 
