@@ -48,7 +48,7 @@ def get_playoffs():
         'Western Conf Finals': 0.75,
     })
 
-    print(df_playoffs)
+    #print(df_playoffs)
     return df_playoffs
 
 
@@ -123,7 +123,13 @@ def scrape_years(years):
 
         # merge all the dataframes into one larger one with all the stats per team
         cur_df = pd.merge(pd.merge(df_p100, df_adv, on='Team'), df_shoot, on='Team')
-        # print(cur_df)
+
+        # remove the asterix from the teams with it on the end of their name
+        for ind in cur_df.index:
+            if cur_df["Team"][ind].endswith("*"):
+                cur_df["Team"][ind] = cur_df["Team"][ind].rstrip("*").strip()
+
+        print(cur_df)
 
     return years_dict
 
@@ -133,8 +139,8 @@ def main():
     # create the list of years we want data for
     years = list(range(MIN_YEAR, MAX_YEAR + 1))
 
-    #temp_years = [2022]
-    #scrape_years(temp_years)
+    temp_years = [2022]
+    scrape_years(temp_years)
 
     get_playoffs()
 
