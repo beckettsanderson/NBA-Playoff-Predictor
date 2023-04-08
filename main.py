@@ -48,11 +48,10 @@ def get_playoffs():
         'Western Conf Finals': 0.75,
     })
 
-    #print(df_playoffs)
     return df_playoffs
 
 
-def scrape_years(years):
+def scrape_years(years, playoffs):
     """
     Scrape the years and return a dictionary of dataframes
 
@@ -60,6 +59,7 @@ def scrape_years(years):
     ----------
     years : list
         list containing the years to scrape
+    playoffs : dataframe with playoff data
 
     Return
     ------
@@ -129,6 +129,13 @@ def scrape_years(years):
             if cur_df["Team"][ind].endswith("*"):
                 cur_df["Team"][ind] = cur_df["Team"][ind].rstrip("*").strip()
 
+        # Create playoff column and add values
+        cur_df['Playoff'] = 0
+        for p_idx, p_row in playoffs.iterrows():
+            for idx, row in cur_df.iterrows():
+                if p_row['Loss_Tm'] == row['Team']:
+                    cur_df.loc[idx, 'Playoff'] = p_row['Round']
+
         print(cur_df)
 
     return years_dict
@@ -140,9 +147,10 @@ def main():
     years = list(range(MIN_YEAR, MAX_YEAR + 1))
 
     temp_years = [2022]
-    scrape_years(temp_years)
+    df_playoffs = get_playoffs()
 
-    get_playoffs()
+    scrape_years(temp_years, df_playoffs)
+
 
 
 main()
