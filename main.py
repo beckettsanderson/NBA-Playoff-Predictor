@@ -38,6 +38,15 @@ def get_playoffs():
     df_playoffs['Loss_Tm'] = df_playoffs['Loss_Tm'].apply(lambda x: x[0:-4])
 
     # rename playoff series to round
+    df_playoffs['Round'] = df_playoffs['Round'].replace({
+        'Eastern Conf First Round': 0.25,
+        'Eastern Conf Semifinals': 0.5,
+        'Eastern Conf Finals': 0.75,
+        'Finals': 1,
+        'Western Conf First Round': 0.25,
+        'Western Conf Semifinals': 0.5,
+        'Western Conf Finals': 0.75,
+    })
 
     print(df_playoffs)
     return df_playoffs
