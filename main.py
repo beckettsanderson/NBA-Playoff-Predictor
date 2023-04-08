@@ -66,7 +66,7 @@ def scrape_years(years, playoffs):
     years_dict : dictionary
         dictionary containing years referencing data frames
     """
-    years_dict = {}
+    df = pd.DataFrame()
     season_url = "https://www.basketball-reference.com/leagues/NBA_{}.html"
 
     # loop through all the years in the list
@@ -123,22 +123,28 @@ def scrape_years(years, playoffs):
 
         # merge all the dataframes into one larger one with all the stats per team
         cur_df = pd.merge(pd.merge(df_p100, df_adv, on='Team'), df_shoot, on='Team')
+        cur_df['Year'] = year
+
+        # narrow playoffs down to each year
+        playoffs = playoffs[playoffs['Yr'] == year]
 
         # remove the asterix from the teams with it on the end of their name
         for ind in cur_df.index:
             if cur_df["Team"][ind].endswith("*"):
                 cur_df["Team"][ind] = cur_df["Team"][ind].rstrip("*").strip()
 
-        # Create playoff column and add values
+        # create playoff column and add values
         cur_df['Playoff'] = 0
         for p_idx, p_row in playoffs.iterrows():
             for idx, row in cur_df.iterrows():
                 if p_row['Loss_Tm'] == row['Team']:
                     cur_df.loc[idx, 'Playoff'] = p_row['Round']
+                elif p_row['Round'] == 1 and p_row['Win_Tm'] == row['Team']:
+                    cur_df.loc[idx, 'Playoff'] = p_row['Round']
 
-        print(cur_df)
+        df = pd.concat([df, cur_df], ignore_index=True)
 
-    return years_dict
+    return df
 
 
 def main():
@@ -146,11 +152,10 @@ def main():
     # create the list of years we want data for
     years = list(range(MIN_YEAR, MAX_YEAR + 1))
 
-    temp_years = [2022]
+    # get the playoff data
     df_playoffs = get_playoffs()
-
-    scrape_years(temp_years, df_playoffs)
-
+    df = scrape_years(years, df_playoffs)
+    print(df.describe)
 
 
 main()
