@@ -43,11 +43,13 @@ def scrape_years(years):
         # clean advanced data
         df_adv.drop(['Rk', 'L', 'Arena', 'Attend.'], inplace=True, axis=1)
         """ Change W to W/L% """
-        #df_adv['W'] = df_adv['W'].apply(lambda x: round(x / 82, 2))
+        # df_adv['W'] = df_adv['W'].apply(lambda x: round(x / 82, 2))
+        df_adv.drop([30], inplace=True, axis=0)
         df_adv.dropna(axis=1, inplace=True)
 
         # clean shooting data
         df_shoot.drop(['Rk', 'G', 'MP'], inplace=True, axis=1)
+        df_shoot.drop([30], inplace=True, axis=0)
         df_shoot.dropna(axis=1, inplace=True)
 
         print(df_p100)
