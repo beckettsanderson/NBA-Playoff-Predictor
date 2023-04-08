@@ -18,9 +18,20 @@ def get_playoffs():
     playoff_url = "https://www.basketball-reference.com/playoffs/series.html"
     df_playoffs = pd.read_html(playoff_url, header=1)[0]
 
+    # remove empty rows and rows with labels
+    df_playoffs.dropna(axis=0, how='all', inplace=True)
+    df_playoffs.drop(df_playoffs[df_playoffs.Yr == 'Yr'].index, inplace=True)
+
     # drop years below lowest year we're using
+    df_playoffs = df_playoffs.astype({'Yr': 'int'})
+    df_playoffs = df_playoffs[df_playoffs['Yr'] >= MIN_YEAR]
 
     # drop the columns we don't care about and rename the columns left
+    df_playoffs.dropna(axis=1, how='all', inplace=True)
+    df_playoffs.drop(['Lg', 'Unnamed: 3', 'W', 'W.1', 'Favorite', 'Underdog'],
+                     inplace=True,
+                     axis=1)
+    df_playoffs.columns = ['Yr', 'Series', 'Win_Tm', 'Loss_Tm']
 
     # remove parentheses from team names
 
