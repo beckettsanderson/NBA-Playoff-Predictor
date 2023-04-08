@@ -31,7 +31,7 @@ def get_playoffs():
     df_playoffs.drop(['Lg', 'Unnamed: 3', 'W', 'W.1', 'Favorite', 'Underdog'],
                      inplace=True,
                      axis=1)
-    df_playoffs.columns = ['Yr', 'Series', 'Win_Tm', 'Loss_Tm']
+    df_playoffs.columns = ['Yr', 'Round', 'Win_Tm', 'Loss_Tm']
 
     # remove parentheses from team names
 
