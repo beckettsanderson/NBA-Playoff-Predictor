@@ -5,13 +5,23 @@ Final Project
 import pandas as pd
 
 pd.set_option('display.max_columns', None)
+pd.options.mode.chained_assignment = None  # default='warn'
 MIN_YEAR = 2010
 MAX_YEAR = 2023
 
 
 def get_playoffs():
     """
+    Load in playoff dataset and clean it to apply to our teams data
 
+    Parameters
+    ----------
+    None.
+
+    Returns
+    -------
+    df_playoffs : DataFrame
+        cleaned df containing the year, round, and teams for each playoff series
 
     """
     # read in the playoff data
@@ -142,6 +152,7 @@ def scrape_years(years, playoffs):
                 elif p_row['Round'] == 1 and p_row['Win_Tm'] == row['Team']:
                     cur_df.loc[idx, 'Playoff'] = p_row['Round']
 
+        # add the current dataframe to our overall df of teams
         df = pd.concat([df, cur_df], ignore_index=True)
 
     return df
