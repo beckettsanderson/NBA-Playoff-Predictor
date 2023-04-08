@@ -34,6 +34,8 @@ def get_playoffs():
     df_playoffs.columns = ['Yr', 'Round', 'Win_Tm', 'Loss_Tm']
 
     # remove parentheses from team names
+    df_playoffs['Win_Tm'] = df_playoffs['Win_Tm'].apply(lambda x: x[0:-4])
+    df_playoffs['Loss_Tm'] = df_playoffs['Loss_Tm'].apply(lambda x: x[0:-4])
 
     # rename playoff series to round
 
