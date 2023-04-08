@@ -44,18 +44,36 @@ def scrape_years(years):
         df_p100.reset_index(inplace=True, drop=True)
 
         # clean advanced data
-        df_adv.drop(['Rk', 'L', 'Arena', 'Attend.'], inplace=True, axis=1)
-        """ Change W to W/L% """
-        # df_adv['W'] = df_adv['W'].apply(lambda x: round(x / 82, 2))
+        df_adv['win_perc'] = round(df_adv['W'] / (df_adv['W'] + df_adv['L']), 3)
+        df_adv.drop(['Rk', 'W', 'L', 'Arena', 'Attend.'], inplace=True, axis=1)
         df_adv.drop([30], inplace=True, axis=0)
         df_adv.dropna(axis=1, inplace=True)
+        for i in range(15, 19):
+            df_adv.columns.values[i] = 'off_' + df_adv.columns.values[i]
+        for i in range(19, 23):
+            df_adv.columns.values[i] = 'def_' + df_adv.columns.values[i][:-2]
         df_adv.sort_values("Team", inplace=True)
         df_adv.reset_index(inplace=True, drop=True)
 
         # clean shooting data
+        # clean shooting data
         df_shoot.drop(['Rk', 'G', 'MP'], inplace=True, axis=1)
         df_shoot.drop([30], inplace=True, axis=0)
         df_shoot.dropna(axis=1, inplace=True)
+        for i in range(3, 9):
+            df_shoot.columns.values[i] = 'fga_perc_' + df_shoot.columns.values[i]
+        for i in range(9, 15):
+            df_shoot.columns.values[i] = 'fg_perc_' + df_shoot.columns.values[i][:-2]
+        for i in range(15, 17):
+            df_shoot.columns.values[i] = 'fg_ast_perc_' + df_shoot.columns.values[i][:-2]
+        for i in range(17, 19):
+            df_shoot.columns.values[i] = 'dunks_' + df_shoot.columns.values[i]
+        for i in range(19, 21):
+            df_shoot.columns.values[i] = 'layups_' + df_shoot.columns.values[i][:-2]
+        for i in range(21, 23):
+            df_shoot.columns.values[i] = 'corner_' + df_shoot.columns.values[i]
+        df_shoot.columns.values[23] = 'heave_' + df_shoot.columns.values[23]
+        df_shoot.columns.values[24] = 'heave_' + df_shoot.columns.values[24][:-2]
         df_shoot.sort_values("Team", inplace=True)
 
         # merge all the dataframes into one larger one with all the stats per team
