@@ -202,7 +202,7 @@ def main():
     df.to_csv("seasons_data.csv", index=False)
 
     # load in the current year with no playoff column and save as a csv
-    df_23 = scrape_year(current_year, df_playoffs)
+    df_23 = scrape_years(current_year, df_playoffs, cur_year=True)
     df_23.to_csv("2023_data.csv", index=False)
 
 
