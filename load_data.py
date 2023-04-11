@@ -5,6 +5,8 @@ File to load in all the data from Basketball Reference
 import pandas as pd
 
 pd.options.mode.chained_assignment = None  # default='warn'
+MIN_YEAR = 2010
+MAX_YEAR = 2022
 
 
 def get_playoffs(min_year):
@@ -59,7 +61,7 @@ def get_playoffs(min_year):
     return df_playoffs
 
 
-def scrape_year(year, playoffs, season_url):
+def scrape_year(year, playoffs, season_url, cur_year):
     """
     Scrape the years and return a dictionary of dataframes
 
@@ -71,6 +73,8 @@ def scrape_year(year, playoffs, season_url):
         df with playoff data
     season_url : str
         the base url of the basketball reference link
+    cur_year : boolean
+        if the year is the current one (i.e. no playoffs)
 
     Return
     ------
@@ -138,19 +142,20 @@ def scrape_year(year, playoffs, season_url):
         if cur_df["Team"][ind].endswith("*"):
             cur_df["Team"][ind] = cur_df["Team"][ind].rstrip("*").strip()
 
-    # create playoff column and add values
-    cur_df['Playoff'] = 0
-    for p_idx, p_row in playoffs.iterrows():
-        for idx, row in cur_df.iterrows():
-            if p_row['Loss_Tm'] == row['Team']:
-                cur_df.loc[idx, 'Playoff'] = p_row['Round']
-            elif p_row['Round'] == 1 and p_row['Win_Tm'] == row['Team']:
-                cur_df.loc[idx, 'Playoff'] = p_row['Round']
+    # create playoff column and add values if it's not the current year
+    if not cur_year:
+        cur_df['Playoff'] = 0
+        for p_idx, p_row in playoffs.iterrows():
+            for idx, row in cur_df.iterrows():
+                if p_row['Loss_Tm'] == row['Team']:
+                    cur_df.loc[idx, 'Playoff'] = p_row['Round']
+                elif p_row['Round'] == 1 and p_row['Win_Tm'] == row['Team']:
+                    cur_df.loc[idx, 'Playoff'] = p_row['Round']
 
     return cur_df
 
 
-def scrape_years(years, playoffs):
+def scrape_years(years, playoffs, cur_year=False):
     """
     Scrape the years and return a dictionary of dataframes
 
@@ -158,7 +163,10 @@ def scrape_years(years, playoffs):
     ----------
     years : list
         list containing the years to scrape
-    playoffs : dataframe with playoff data
+    playoffs : DataFrame
+        df with playoff data
+    cur_year : boolean
+        if the year is the current one (i.e. no playoffs)
 
     Return
     ------
@@ -172,9 +180,30 @@ def scrape_years(years, playoffs):
     for year in years:
 
         # scrape the year's data into a dataframe
-        cur_df = scrape_year(year, playoffs, season_url)
+        cur_df = scrape_year(year, playoffs, season_url, cur_year)
 
         # add the current dataframe to our overall df of teams
         df = pd.concat([df, cur_df], ignore_index=True)
 
     return df
+
+
+def main():
+
+    # create the list of years we want data for
+    years = list(range(MIN_YEAR, MAX_YEAR + 1))
+    current_year = [2023]
+
+    # get the playoff data
+    df_playoffs = get_playoffs(MIN_YEAR)
+
+    # load in the entirety of the years seasons and save is as a csv
+    df = scrape_years(years, df_playoffs)
+    df.to_csv("seasons_data.csv", index=False)
+
+    # load in the current year with no playoff column and save as a csv
+    df_23 = scrape_year(current_year, df_playoffs)
+    df_23.to_csv("2023_data.csv", index=False)
+
+
+main()
