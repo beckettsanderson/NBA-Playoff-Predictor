@@ -20,9 +20,6 @@ def main():
     all_df = pd.read_csv(ALL_SEASONS)
     df_23 = pd.read_csv(CUR_SEASON)
 
-    # concat the data
-    df = pd.concat([all_df, df_23], ignore_index=True)
-
     # drop minutes played and attendance per game
     all_df.drop(['MP', 'Attend./G'], axis=1, inplace=True)
     df_23.drop(['MP', 'Attend./G'], axis=1, inplace=True)
