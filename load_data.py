@@ -38,9 +38,10 @@ def get_playoffs(min_year):
 
     # drop the columns we don't care about and rename the columns left
     df_playoffs.dropna(axis=1, how='all', inplace=True)
-    df_playoffs.drop(['Lg', 'Unnamed: 3', 'W', 'W.1', 'Favorite', 'Underdog'],
+    df_playoffs.drop(['Lg', 'Unnamed: 3', 'Unnamed: 4', 'Unnamed: 7', 'W', 'W.1', 'Favorite', 'Underdog'],
                      inplace=True,
                      axis=1)
+
     df_playoffs.columns = ['Yr', 'Round', 'Win_Tm', 'Loss_Tm']
 
     # remove parentheses from team names
@@ -199,11 +200,11 @@ def main():
 
     # load in the entirety of the years seasons and save is as a csv
     df = scrape_years(years, df_playoffs)
-    df.to_csv("seasons_data.csv", index=False)
+    #df.to_csv("seasons_data.csv", index=False)
 
     # load in the current year with no playoff column and save as a csv
     df_23 = scrape_years(current_year, df_playoffs, cur_year=True)
-    df_23.to_csv("2023_data.csv", index=False)
+    #df_23.to_csv("2023_data.csv", index=False)
 
 
 main()
