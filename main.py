@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from sklearn.linear_model import LinearRegression
 import copy
 
 pd.set_option('display.max_columns', None)
@@ -108,6 +109,45 @@ def main():
                             'Playoff': y_pred})
     outcome.sort_values('Playoff', ascending=False, inplace=True, ignore_index=True)
     print(outcome)
+
+
+
+    # clean things
+    all_df.drop(['MP', 'Attend./G'], inplace=True, axis=1)
+    df_23.drop(['MP', 'Attend./G'], inplace=True, axis=1)
+
+    # get target variable
+    X_train = all_df[all_df.columns[1:-2]]  # all data except team, year, and playoff
+    y_train = all_df[['Playoff']]
+
+    # create the regression and fit it with the data
+    reg = LinearRegression()
+    reg.fit(X_train, y_train)
+
+    # find the most impactful variables
+    coef = reg.coef_.tolist()[0]
+    variables = list(X_train.columns)
+    equation = pd.DataFrame({'Label': variables,
+                             'Coefficient': coef})
+    equation.sort_values('Coefficient', ascending=False, inplace=True, ignore_index=True)
+    print(equation)
+
+    # calculate and display the r-squared value
+    r_sq = round(reg.score(X_train, y_train), 5)
+    print('\nThe R-Squared is:', r_sq)
+
+    # run the regression on the data for this year
+    X_test = df_23[df_23.columns[1:-1]]
+    y_pred = reg.predict(X_test)
+
+    # assign the predictions to the teams and sort
+    teams = list(df_23.loc[:, 'Team'])
+    playoff = y_pred.tolist()
+    predictions = pd.DataFrame({'Team': teams,
+                                'Playoff': playoff})
+    predictions.sort_values('Playoff', ascending=False, inplace=True, ignore_index=True)
+
+    print(predictions)
 
 
 main()
